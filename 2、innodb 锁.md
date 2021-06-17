@@ -154,8 +154,6 @@ Record lock, heap no 3 PHYSICAL RECORD: n_fields 3; compact format; info bits 0
  2: len 7; hex 9000000172011c; asc     r  ;;...
 ```
 
-#### 
-
 ### 表级锁定
 
 对于MyISAM， MEMORY或者MERGE表，使用的是表锁，这种类型的表使用场景多为read-only, read-mostly或者single-user应用中。在获取表锁的时候，如果多个请求需要获取同一张表的锁，那么通常就需要进行排序，当前请求必须等到前一个请求处理完成后才能获取到表锁进行后续的处理。
@@ -178,9 +176,9 @@ Record lock, heap no 3 PHYSICAL RECORD: n_fields 3; compact format; info bits 0
 
 更新操作优先级高于查询操作。因此，当释放锁时，写锁操作先执行，然后是读锁请求。确保了表有大量的查询时，对表的更新不会造成“饥饿问题”。如果一个表有许多更新，SELECT语句将等待，直到不再更新为止。
 
-可以通过命令 SHOW STATUS LIKE 'Table%'; 检查 Table_locks_immediate 和 Table_locks_waited 状态变量来分析系统的表锁争用，这两个变量分别表示可以立即授予表锁请求的次数和必须等待的次数。
+可以通过命令 `SHOW STATUS LIKE 'Table%';` 检查 Table_locks_immediate 和 Table_locks_waited 状态变量来分析系统的表锁争用，这两个变量分别表示可以立即授予表锁请求的次数和必须等待的次数。
 
-如果使用 [LOCK TABLES](https://dev.mysql.com/doc/refman/8.0/en/lock-tables.html) 显式获取表锁，则可以请求READ LOCAL锁而不是读锁，以便在锁定表时使其他会话能够执行并发插入。
+如果使用`LOCK TABLES`显式获取表锁，则可以请求`READ LOCAL`锁而不是读锁，以便在锁定表时使其他会话能够执行并发插入。
 
 若要在无法并发插入时对表 t1 执行大批量插入和查询操作，可以将数据插入临时表 temp_t1 ，并使用临时表中的数据更新表：
 
@@ -268,16 +266,6 @@ MySQL对除InnoDB之外的所有存储引擎都使用表锁定（而不是页、
 - 表锁定允许多个会话同时从表中读取数据，但如果会话要向表中写入数据，则必须首先获得独占访问权限，这意味着它可能必须等待其他会话先完成表的访问。在更新期间，要访问此特定表的所有其他会话必须等待更新完成。
 - 当会话正在等待时，表锁定会导致问题，因为磁盘已满，在会话可以继续之前，需要有可用空间。在这种情况下，所有要访问问题表的会话都将处于等待状态，直到有更多的磁盘空间可用。
 - 运行SELECT语句需要很长时间，这会阻止其他会话同时更新表，从而使其他会话看起来很慢或没有响应。当会话等待以独占方式访问表以进行更新时，发出SELECT语句的其他会话将在其后面排队，从而降低了并发性，即使对于只读会话也是如此。
-
-## 锁相关系统表
-
-| 表名                               | 描述       |
-| ---------------------------------- | ---------- |
-| performance_schema.data_locks      | 数据锁     |
-| performance_schema.data_lock_waits | 数据锁等待 |
-| performance_schema.metadata_locks  | 字典数据锁 |
-| performance_schema.table_handles   | 表锁       |
-|                                    |            |
 
 ## 参考资料
 
