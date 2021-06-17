@@ -269,7 +269,7 @@ MySQL对除InnoDB之外的所有存储引擎都使用表锁定（而不是页、
 
 ## 参考资料
 
-- 官方文档 [`15.7.1 InnoDB Locking`](https://dev.mysql.com/doc/refman/8.0/en/innodb-locking.html)
-- 官方文档 [`15.15.2.2 InnoDB Lock and Lock-Wait Information`](https://dev.mysql.com/doc/refman/8.0/en/innodb-information-schema-understanding-innodb-locking.html)
-- 官方文档 [`8.11 Optimizing Locking Operations`](https://dev.mysql.com/doc/refman/8.0/en/locking-issues.html)
+- 官方文档 [15.7.1 InnoDB Locking](https://dev.mysql.com/doc/refman/8.0/en/innodb-locking.html)
+- 官方文档 [15.15.2.2 InnoDB Lock and Lock-Wait Information](https://dev.mysql.com/doc/refman/8.0/en/innodb-information-schema-understanding-innodb-locking.html)
+- 官方文档 [8.11 Optimizing Locking Operations](https://dev.mysql.com/doc/refman/8.0/en/locking-issues.html)
 

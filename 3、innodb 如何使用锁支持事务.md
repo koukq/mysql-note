@@ -302,4 +302,5 @@ mysql> SELECT * FROM t FOR UPDATE SKIP LOCKED;
 
 ## 参考资料
 
-官方文档 [`15.7.2 InnoDB Transaction Model`](https://dev.mysql.com/doc/refman/8.0/en/innodb-transaction-model.html)
+- 官方文档 [15.7.2 InnoDB Transaction Model](https://dev.mysql.com/doc/refman/8.0/en/innodb-transaction-model.html)
+

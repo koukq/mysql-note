@@ -114,7 +114,8 @@ InnoDB 获取先前初始化的自动增量列的值，不设置任何锁。
 
 ## 参考资料
 
-[15.7.3 Locks Set by Different SQL Statements in InnoDB](https://dev.mysql.com/doc/refman/8.0/en/innodb-locks-set.html)
+- 官方文档 [15.7.3 Locks Set by Different SQL Statements in InnoDB](https://dev.mysql.com/doc/refman/8.0/en/innodb-locks-set.html)
 
-[13.3 Transactional and Locking Statements](https://dev.mysql.com/doc/refman/8.0/en/sql-transactional-statements.html)
+- 官方文档 [13.3 Transactional and Locking Statements](https://dev.mysql.com/doc/refman/8.0/en/sql-transactional-statements.html)
+
 

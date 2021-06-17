@@ -1,11 +1,11 @@
 ## 事务概述
 
-事务一般是指要做的或所做的事情。在关系数据库中，一个事务可以是一条SQL语句，一组SQL语句或整个程序，是恢复和并发控制的基本单位。事务应该具有4个属性：原子性、一致性、隔离性、持久性，这四个属性通常称为ACID特性。
+在关系数据库中，一个事务可以是一条SQL语句，一组SQL语句或整个程序，是恢复和并发控制的基本单位。事务应该具有4个属性：原子性、一致性、隔离性、持久性，这四个属性通常称为 ACID 特性。
 
-- A（atomicity）：原子性。一个事务要么全部提交成功，要么全部失败回滚，不能只执行其中的一部分操作，这就是事务的原子性。
-- C（consistency）：一致性。事务的执行不能破坏数据库数据的完整性和一致性，一个事务在执行之前和执行之后，数据库都必须处于一致性状态。
-- I（isolation）：隔离性。事务的隔离性是指在并发环境中，并发的事务时相互隔离的，一个事务的执行不能不被其他事务干扰。不同的事务并发操作相同的数据时，每个事务都有各自完成的数据空间，即一个事务内部的操作及使用的数据对其他并发事务时隔离的，并发执行的各个事务之间不能相互干扰。
-- D（durability）：持久性。一旦事务提交，那么它对数据库中的对应数据的状态的变更就会永久保存到数据库中。
+- A（`Atomicity`）：原子性。一个事务要么全部提交成功，要么全部失败回滚，不能只执行其中的一部分操作。
+- C（`Consistency`）：一致性。事务的执行不能破坏数据库数据的完整性和一致性，一个事务在执行之前和执行之后，数据库都必须处于一致的状态。
+- I（`Isolation`）：隔离性。事务的隔离性是指在并发环境中，并发的事务时相互隔离，一个事务的执行不能被其他事务干扰。不同的事务并发操作相同的数据时，每个事务都有各自的数据空间，即一个事务内部的操作及使用的数据对其他并发事务是隔离的，并发执行的各个事务之间不能相互干扰。
+- D（`Durability`）：持久性。一旦事务提交，那么它对数据的变更就会永久保存到数据库中。
 
 ## Mysql 事务
 
@@ -25,7 +25,7 @@ mysql> SHOW VARIABLES LIKE 'autocommit';
 
 可使用 `BEGIN` 或 `START TRANSACTION` 手动开启一个事务之后，自动提交将保持禁用状态，直到使用 `COMMIT` 或 `ROLLBACK` 结束事务。之后，自动提交模式会恢复到之前的状态。
 
-使用 `SET autocommit = 0;` 关闭自动提交。Mysql 会默认开启一个事务，直到 `COMMIT` 或 `ROLLBACK`  执行后，其他会话才能看到本次修改后的数据。而本回话会再次开启一个事务。
+使用 `SET autocommit = 0;` 关闭自动提交。Mysql 会默认开启一个事务，直到 `COMMIT` 或 `ROLLBACK`  执行后，其他会话才能看到本次修改后的数据。而当前会话再次默认开启一个事务。
 
 
 
@@ -42,18 +42,18 @@ mysql> SHOW VARIABLES LIKE 'autocommit';
 1 row in set, 1 warning (0.00 sec)
 ```
 
-如何保障事务满足ACID，具体可参考官方文档 [15.2 InnoDB 和 ACID 模型](https://dev.mysql.com/doc/refman/8.0/en/mysql-acid.html)。
+InnoDB 如何保障事务满足 ACID，具体可参考官方文档 [15.2 InnoDB 和 ACID 模型](https://dev.mysql.com/doc/refman/8.0/en/mysql-acid.html)。
 
 ## 事务隔离
 
 事务隔离是数据库应用的基础之一。隔离是 ACID 模型中的 I ；隔离级别是一种设置，当多个事务同时进行更改和执行查询时，它可以微调性能与结果的可靠性、一致性和可再现性之间的平衡。
 
-InnoDB 提供 SQL:1992 standard 描述的四个事务隔离级别：
+InnoDB 提供 `SQL:1992 standard` 描述的四个事务隔离级别：
 
-- 读未提交（READ UNCOMMITTED，简称 RU）：事务可以看到别的事务未提交的数据（会导致 脏读、不可重复读、幻读）。
-- 读提交（ READ COMMITTED，简称 RC）：事务可以看到别的事务提交的数据（会导致 不可重复读、幻读）。
-- 可重复读（REPEATABLE READ，简称 RR）：使用 `MMVC`机制 实现可重复读，使用间隙锁和临键锁解决大部分幻行问题。（会导致 幻读）
-- 可序列化（SERIALIZABLE）：所有事务有序执行。
+- 读未提交（`READ UNCOMMITTED`，简称 RU）：事务可以看到别的事务未提交的数据（会导致 脏读、不可重复读、幻读）。
+- 读提交（ `READ COMMITTED`，简称 RC）：事务可以看到别的事务提交的数据（会导致 不可重复读、幻读）。
+- 可重复读（`REPEATABLE READ`，简称 RR）：使用 `MVCC`机制 实现可重复读，使用间隙锁（Gap Locks）和临键锁（Next-Key Locks）解决大部分幻行问题。（会导致 幻读）
+- 可序列化（`SERIALIZABLE`）：所有事务有序执行。
 
 > 1. 脏读：读到了其他事务未提交的数据，这些数据可能处于不一致状态，也可能会回滚，最终可能不会存到数据库；
 >
@@ -160,44 +160,11 @@ InnoDB 在以下情况下认为是只读事务：
 
 因此，对于生成报表这样的读密集型操作，您可以通过在`START TRANSACTION READ ONLY`和`COMMIT`中对 InnoDB 查询进行优化，或者在运行`SELECT`语句之前打开 `autocommit` 设置，或者简单地避免查询中夹杂的任何数据更改语句，来优化 InnoDB 查询。
 
-## 当前事务查看
-
-`INFORMATION_SCHEMA`.`INNODB_TRX`表提供当前在引擎执行的每个事务的信息，包括事务是否正在等待锁、事务何时启动以及事务正在执行的SQL语句（如果有的话）。
-
-| 字段                       | 描述                                                         |
-| -------------------------- | ------------------------------------------------------------ |
-| **TRX_ID**                 | InnoDB 内部的唯一事务ID号。只读和非锁定事务没有。            |
-| TRX_WEIGHT                 | 事务的权重，反映（但不一定是确切的计数）被更改的行数和被事务锁定的行数。为了解决死锁，InnoDB选择权重最小的事务作为要回滚的“牺牲品”。已更改非事务表的事务被视为比其他事务重，而不管更改和锁定的行数是多少。 |
-| **TRX_STATE**              | 事务执行状态。 `RUNNING`, `LOCK WAIT`, `ROLLING BACK`, 和`COMMITTING`. |
-| **TRX_STARTED**            | 事务开始时间。                                               |
-| TRX_REQUESTED_LOCK_ID      | 如果`TRX_STATE`为`LOCK WAIT`，则事务当前正在等待的锁的ID；否则为空。要获取有关锁的详细信息，请将此列与`performance_schema`.`data_locks`表的`ENGINE_LOCK_ID`列连接起来。 |
-| **TRX_WAIT_STARTED**       | 事务开始等待锁的时间，如果`TRX_STATE`为`LOCK WAIT`；否则为空。 |
-| TRX_MYSQL_THREAD_ID        | MySQL线程ID。若要获取有关线程的详细信息，请将此列与`PROCESSLIST`表的ID列连接起来。 |
-| **TRX_QUERY**              | 事务正在执行的SQL语句。                                      |
-| TRX_OPERATION_STATE        | 事务的当前操作（如有）；否则为空                             |
-| TRX_TABLES_IN_USE          | 处理此事务的当前 SQL 语句时使用的 InnoDB 表数。              |
-| TRX_TABLES_LOCKED          | 当前SQL语句具有行锁定的 InnoDB 表数(因为这些是行锁，而不是表锁，所以尽管某些行被锁定，但通常仍可以由多个事务读取和写入表。） |
-| TRX_LOCK_STRUCTS           | 事务保留的锁数。                                             |
-| TRX_LOCK_MEMORY_BYTES      | 内存中此事务的锁结构占用的总大小。                           |
-| TRX_ROWS_LOCKED            | 此事务锁定的大约行数。该值可能包括物理上存在但事务不可见的删除标记行。 |
-| TRX_ROWS_MODIFIED          | 此事务中已修改和插入的行数。                                 |
-| TRX_CONCURRENCY_TICKETS    | 一个值，指示当前事务在被调出之前可以做多长时间的工作，由 `innodb_concurrency_tickets` 系统变量指定。 |
-| TRX_ISOLATION_LEVEL        | 当前事务的隔离级别。                                         |
-| TRX_UNIQUE_CHECKS          | 当前事务唯一性检查启用还是禁用。当批量数据导入时，这个参数是关闭的。 |
-| TRX_FOREIGN_KEY_CHECKS     | 当前事务的外键坚持是启用还是禁用。当批量数据导入时，这个参数是关闭的。 |
-| TRX_LAST_FOREIGN_KEY_ERROR | 最新一个外键错误信息，没有则为空。                           |
-| TRX_ADAPTIVE_HASH_LATCHED  | 自适应哈希索引是否被当前事务阻塞。当自适应哈希索引查找系统分区，一个单独的事务不会阻塞全部的自适应hash索引。自适应hash索引分区通过 `innodb_adaptive_hash_index_parts`参数控制，默认值为8。 |
-| TRX_ADAPTIVE_HASH_TIMEOUT  | 是否为了自适应hash索引立即放弃查询锁，或者通过调用mysql函数保留它。当没有自适应hash索引冲突，该值为0并且语句保持锁直到结束。在冲突过程中，该值被计数为0，每句查询完之后立即释放门闩。当自适应hash索引查询系统被分区（由 `innodb_adaptive_hash_index_parts`参数控制），值保持为0。 |
-| TRX_IS_READ_ONLY           | 值为1表示事务是read only。                                   |
-| TRX_AUTOCOMMIT_NON_LOCKING | 值为1表示事务是一个select语句，该语句没有使用for update或者shared mode锁，并且执行开启了autocommit，因此事务只包含一个语句。当`TRX_AUTOCOMMIT_NON_LOCKING`和`TRX_IS_READ_ONLY`同时为1，InnoDB 优化事务，以减少事务与更改表数据相关的开销。 |
-| TRX_SCHEDULE_WEIGHT        | 由争用感知事务调度（CATS）算法分配给等待锁的事务的事务调度权重。该值相对于其他事务的值。值越大，权重越大。仅为`TRX_STATE` 值 `LOCK WAIT` 状态的事务计算。未等待锁定的事务为空值。`TRX_SCHEDULE_WEIGHT` 值与`TRX_WEIGHT` 值不同，`TRX_WEIGHT` 值是由不同的算法为不同的目的计算的。 |
-
 
 
 ## 参考资料
 
-- 官方文档  [`15.2 InnoDB and the ACID Model`](https://dev.mysql.com/doc/refman/8.0/en/mysql-acid.html)
-- 官方文档 [`15.7.2 InnoDB Transaction Model`](https://dev.mysql.com/doc/refman/8.0/en/innodb-transaction-model.html)
-- 官方文档 [`8.5.3 Optimizing InnoDB Read-Only Transactions`](https://dev.mysql.com/doc/refman/8.0/en/innodb-performance-ro-txn.html)
-- 官方文档 [`26.4.30 The INFORMATION_SCHEMA INNODB_TRX Table`](https://dev.mysql.com/doc/refman/8.0/en/information-schema-innodb-trx-table.html)
+- 官方文档  [15.2 InnoDB and the ACID Model](https://dev.mysql.com/doc/refman/8.0/en/mysql-acid.html)
+- 官方文档 [15.7.2 InnoDB Transaction Model](https://dev.mysql.com/doc/refman/8.0/en/innodb-transaction-model.html)
+- 官方文档 [8.5.3 Optimizing InnoDB Read-Only Transactions](https://dev.mysql.com/doc/refman/8.0/en/innodb-performance-ro-txn.html)
 
