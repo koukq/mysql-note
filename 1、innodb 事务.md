@@ -148,15 +148,16 @@ InnoDB 可以避免为只读事务设置事务ID（`TRX_ID` 字段）带来的�
 
 InnoDB 在以下情况下认为是只读事务：
 
-事务是用`START TRANSACTION READ ONLY` 语句启动的。在这种情况下，尝试更改数据库（对于InnoDB、MyISAM或其他类型的表）会导致错误，事务将以只读状态继续：
+1. 事务是用`START TRANSACTION READ ONLY` 语句启动的。在这种情况下，尝试更改数据库（对于InnoDB、MyISAM或其他类型的表）会导致错误，事务将以只读状态继续：
 
-> ERROR 1792 (25006): Cannot execute statement in a READ ONLY transaction.
+   > ERROR 1792 (25006): Cannot execute statement in a READ ONLY transaction.
 
-仍然可以在只读事务中更改特定于会话的临时表，或者为它们发出锁定查询，因为这些更改和锁定对任何其他事务都不可见。
+   仍然可以在只读事务中更改特定于会话的临时表，或者为它们发出锁定查询，因为这些更改和锁定对任何其他事务都不可见。
 
-启用自动提交设置，从而保证事务是单个语句，构成事务的单个语句是“非锁定”的 SELECT 语句。也就是说，一个不使用`FOR UPDATE`或`LOCK IN SHARED MODE`子句的 SELECT。
+2. 启用自动提交设置，从而保证事务是单个语句，构成事务的单个语句是“非锁定”的 SELECT 语句。也就是说，一个不使用`FOR UPDATE`或`LOCK IN SHARED MODE`子句的 SELECT。
 
-事务是在没有`READ ONLY`选项的情况下启动的，但是还没有执行显式锁定行的更新或语句。在需要更新或显式锁之前，事务将保持只读模式。
+3. 事务是在没有`READ ONLY`选项的情况下启动的，但是还没有执行显式锁定行的更新或语句。在需要更新或显式锁之前，事务将保持只读模式。
+
 
 因此，对于生成报表这样的读密集型操作，您可以通过在`START TRANSACTION READ ONLY`和`COMMIT`中对 InnoDB 查询进行优化，或者在运行`SELECT`语句之前打开 `autocommit` 设置，或者简单地避免查询中夹杂的任何数据更改语句，来优化 InnoDB 查询。
 
